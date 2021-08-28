@@ -1,0 +1,2 @@
+0
+This is a test message and I am a test NPC :)

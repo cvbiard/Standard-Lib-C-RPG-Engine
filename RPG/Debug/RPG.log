@@ -1,0 +1,18 @@
+﻿  main.c
+C:\Users\Clark\Desktop\CS121\Clark Biard\RPG\main.c(16,32): warning C4047: '=': 'char' differs in levels of indirection from 'char [10]'
+C:\Users\Clark\Desktop\CS121\Clark Biard\RPG\main.c(35,45): warning C4047: '=': 'char' differs in levels of indirection from 'char [15]'
+C:\Users\Clark\Desktop\CS121\Clark Biard\RPG\main.c(42,45): warning C4047: '=': 'char' differs in levels of indirection from 'char [13]'
+C:\Users\Clark\Desktop\CS121\Clark Biard\RPG\main.c(49,47): warning C4047: '=': 'char' differs in levels of indirection from 'char [14]'
+C:\Users\Clark\Desktop\CS121\Clark Biard\RPG\main.c(56,41): warning C4047: '=': 'char' differs in levels of indirection from 'char [13]'
+C:\Users\Clark\Desktop\CS121\Clark Biard\RPG\main.c(72,67): warning C4047: '=': 'char *' differs in levels of indirection from 'char **'
+C:\Users\Clark\Desktop\CS121\Clark Biard\RPG\main.c(59,1): warning C4047: 'initializing': 'int' differs in levels of indirection from 'tile *'
+C:\Users\Clark\Desktop\CS121\Clark Biard\RPG\main.c(59,1): warning C4047: 'initializing': 'char **' differs in levels of indirection from 'tile *'
+C:\Users\Clark\Desktop\CS121\Clark Biard\RPG\main.c(59,1): warning C4133: 'initializing': incompatible types - from 'tile *' to 'FILE *'
+C:\Users\Clark\Desktop\CS121\Clark Biard\RPG\main.c(59,1): warning C4047: 'initializing': 'char' differs in levels of indirection from 'tile *'
+  protos.c
+C:\Users\Clark\Desktop\CS121\Clark Biard\RPG\protos.c(164,36): warning C4048: different array subscripts: 'int (*)[30]' and 'int (*)[10]'
+C:\Users\Clark\Desktop\CS121\Clark Biard\RPG\protos.c(173,36): warning C4048: different array subscripts: 'int (*)[30]' and 'int (*)[10]'
+C:\Users\Clark\Desktop\CS121\Clark Biard\RPG\protos.c(182,36): warning C4048: different array subscripts: 'int (*)[30]' and 'int (*)[10]'
+C:\Users\Clark\Desktop\CS121\Clark Biard\RPG\protos.c(191,36): warning C4048: different array subscripts: 'int (*)[30]' and 'int (*)[10]'
+  Generating Code...
+  RPG.vcxproj -> C:\Users\Clark\Desktop\CS121\Clark Biard\RPG\Debug\RPG.exe

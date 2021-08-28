@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/Clark/Desktop/stream/RPG/header.h
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+conio.h
+-
+
+C:/Users/Clark/Desktop/stream/RPG/protos.c
+header.h
+C:/Users/Clark/Desktop/stream/RPG/header.h
+
