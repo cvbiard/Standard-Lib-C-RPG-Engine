@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-C:/Users/Clark/Desktop/stream/RPG/header.h
+C:/Users/Clark/Desktop/Standard Lib C RPG Engine/Standard-Lib-C-RPG-Engine/RPG/header.h
 stdio.h
 -
 stdlib.h
@@ -16,7 +16,7 @@ string.h
 conio.h
 -
 
-C:/Users/Clark/Desktop/stream/RPG/protos.c
+C:/Users/Clark/Desktop/Standard Lib C RPG Engine/Standard-Lib-C-RPG-Engine/RPG/protos.c
 header.h
-C:/Users/Clark/Desktop/stream/RPG/header.h
+C:/Users/Clark/Desktop/Standard Lib C RPG Engine/Standard-Lib-C-RPG-Engine/RPG/header.h
 
