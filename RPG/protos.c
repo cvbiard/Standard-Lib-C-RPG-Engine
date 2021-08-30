@@ -245,7 +245,7 @@ void print_screen(int *scrstr, int screen_size)
     //Runs through the scrstr printing the ints as characters, and inserting a newline when we've hit the end of a line.
     for(int i = 0; i<screen_size;i++)
     {
-        printf("%c", (char)scrstr[i]);
+        printf( "%c", (char)scrstr[i]);
         if(line_pos == (tile_width*width)+1)
         {
             printf("\n");

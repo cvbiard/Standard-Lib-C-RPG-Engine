@@ -128,6 +128,7 @@ int main(void)
     read_message(msg[0]);
 
 
+
     //The main gameplay loop.
 	while (exit != 1)
 	{
