@@ -275,7 +275,7 @@ void load_scene(struct asset* scenes, int tile_ids[width][height], int tile_freq
 	fclose(scene_file);
 }
 //Handles everything related to movement, including collisions, warping (changing scene), and getting a message from a tile.
-int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile_width)], char input, char player_tile[(tile_width*tile_height)], int *linear_ids, struct tile* Tiles, struct asset* scenes, int tile_ids[width][height], int tile_frequency[(width*height)], struct object *player, int screen_size, int msg[1])
+int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile_width)], int input, char player_tile[(tile_width*tile_height)], int *linear_ids, struct tile* Tiles, struct asset* scenes, int tile_ids[width][height], int tile_frequency[(width*height)], struct object *player, int screen_size, int msg[1])
 {
     //Linear movement to a 2D space
     //One space down is +10
@@ -287,7 +287,7 @@ int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile
     int prewarppos = 0;
 
     //If the input is w, we want to go up so we need to get information from the tile directly above the player.
-    if (input == 'w' || input == 'W')
+    if (input == 1)
     {
         //Make sure the tile we want to go to is in bounds, and also check if it is a door (warp point).
         if(((player->pos) - width) >= 0 && (Tiles + linear_ids[(player->pos) - width])->flags[1] == 'd')
@@ -345,7 +345,7 @@ int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile
     }
 
     //If the input is s, we need to check the information for the tile directly below the player.
-    if (input == 's' || input == 'S')
+    if (input == 3)
     {
         //The only difference between other inputs and w is the direction we look for potential movement, and how we check bounds. There's no way to move down and get to an out of bounds position <0, so we only need to check
         //above the maximum position. Besides that, the only difference is moving down a tile is adding one width to the position instead of subtracting it.
@@ -392,7 +392,7 @@ int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile
         }
     }
     //Same deal, but now we want to check to the left, which is -1 instead of adding or subtracting width.
-    if (input == 'a' || input == 'A' )
+    if (input == 2)
     {
         if((player->pos) - 1 >= 0 && (Tiles + linear_ids[(player->pos) - 1])->flags[1] == 'd')
         {
@@ -437,7 +437,7 @@ int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile
         }
     }
     //And finally, now we add one to position instead of subtract to move to the right.
-    if (input == 'd' || input == 'D')
+    if (input == 4)
     {
         if((player->pos)%width != (width-1)  && (Tiles + linear_ids[(player->pos) + 1])->flags[1] == 'd')
         {

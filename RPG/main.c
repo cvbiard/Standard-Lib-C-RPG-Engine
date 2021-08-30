@@ -33,7 +33,7 @@ int main(void)
     printf("%d\n", scene_amount);
 
     //Create the input variable to store player input in.
-	char input = '\0';
+	int input = 0;
 
 	//Allocate heap memory for the screen string (the string that is actually printed to the screen) and the background map (the string that holds the background characters so that the screen string can be restored after
 	//some destructive action such as the player moving on to a tile)
@@ -131,11 +131,11 @@ int main(void)
     //The main gameplay loop.
 	while (exit != 1)
 	{
-        //Get input from the player. Using conio.h for testing purposes since it doesn't require hitting enter after every input like scanf does.
-		input = _getch();
+        //Get input from the player. Using system command because it doesn't require pressing enter after an input like scanf does.
+		input = system("CHOICE /N /C:wasdprtui");
 
 		//Exit input
-		if (input == 'p')
+		if (input == 5)
         {
             free(scrstr);
             free(bgmap);
@@ -145,14 +145,14 @@ int main(void)
         }
 
 		//Reload input. This reload entirely restarts the program, meaning memory is freed and reallocated so new tiles and scenes we created will be included.
-        if (input == 'r' && debug == 't')
+        if (input == 6 && debug == 't')
         {
             atexit(system("RPG.exe"));
             break;
         }
 
         //Visual reload. All this does is reload the scene which is useful for changing tiles in a scene to ones that already exist, or changing how a tile looks.
-        if (input == 't' && debug == 't')
+        if (input == 7 && debug == 't')
         {
             load_scene((scenes+0), tile_ids, tile_frequency);
             get_frequency(tile_ids, tile_frequency);
@@ -160,13 +160,13 @@ int main(void)
         }
 
         //Test ui draw
-        if(input == 'u')
+        if(input == 8)
         {
             ui_manager(scrstr, bgmap, 88, *(Tiles+28), 0, tile_map);
         }
 
         //Test ui remove
-        if(input == 'i')
+        if(input == 9)
         {
             ui_manager(scrstr, bgmap, 88, *(Tiles+28), 1, tile_map);
         }
@@ -178,7 +178,7 @@ int main(void)
         player.pos = move(scrstr, bgmap, tile_map, input, player_tile, linear_ids, Tiles, scenes, tile_ids, tile_frequency, &player, scr_size, msg);
 
         //Reset input
-		input = '\0';
+		input = 0;
 
 		//Clear the previous step display
 		system("cls");
