@@ -7,6 +7,8 @@ e
 -1
 -1
 -1
+0
+n
 1
 Player
 PlayerTile.txt
@@ -16,6 +18,8 @@ e
 -1
 -1
 -1
+0
+n
 2
 Grass
 Grass.txt
@@ -25,6 +29,8 @@ e
 -1
 -1
 -1
+0
+n
 3
 Wall
 Wall.txt
@@ -34,6 +40,8 @@ e
 -1
 -1
 -1
+0
+n
 4
 Door1
 Door.txt
@@ -43,6 +51,8 @@ e
 1
 369
 -1
+0
+n
 5
 Door2
 Door.txt
@@ -52,6 +62,8 @@ e
 0
 252
 -1
+0
+n
 6
 Floor
 Floor.txt
@@ -61,6 +73,8 @@ e
 -1
 -1
 -1
+0
+n
 7
 GrassPath
 GrassPath.txt
@@ -70,6 +84,8 @@ e
 -1
 -1
 -1
+0
+n
 8
 GrassPathH
 GrassPathH.txt
@@ -79,6 +95,8 @@ e
 -1
 -1
 -1
+0
+n
 9
 GrassPathBR
 GrassPathBR.txt
@@ -88,6 +106,8 @@ e
 -1
 -1
 -1
+0
+n
 10
 TreeTop
 TreeTop.txt
@@ -97,6 +117,8 @@ e
 -1
 -1
 -1
+0
+n
 11
 TreeBottom
 TreeBottom.txt
@@ -106,6 +128,8 @@ e
 -1
 -1
 -1
+0
+n
 12
 GrassPathTR
 GrassPathTR.txt
@@ -115,6 +139,8 @@ e
 -1
 -1
 -1
+0
+n
 13
 GrassPathTL
 GrassPathTL.txt
@@ -124,6 +150,8 @@ e
 -1
 -1
 -1
+0
+n
 14
 GrassPathBL
 GrassPathBL.txt
@@ -133,6 +161,8 @@ e
 -1
 -1
 -1
+0
+n
 15
 GrassPathC
 GrassPathC.txt
@@ -142,6 +172,8 @@ e
 -1
 -1
 -1
+0
+n
 16
 Brick
 Brick.txt
@@ -151,6 +183,8 @@ e
 -1
 -1
 -1
+0
+n
 17
 RoofBase
 RoofBase.txt
@@ -160,6 +194,8 @@ e
 -1
 -1
 -1
+0
+n
 18
 RoofL
 RoofL.txt
@@ -169,6 +205,8 @@ e
 -1
 -1
 -1
+0
+n
 19
 RoofR
 RoofR.txt
@@ -178,6 +216,8 @@ e
 -1
 -1
 -1
+0
+n
 20
 RoofT
 RoofT.txt
@@ -187,6 +227,8 @@ e
 -1
 -1
 -1
+0
+n
 21
 Blank
 Blank.txt
@@ -196,6 +238,8 @@ e
 -1
 -1
 -1
+0
+n
 22
 GrassPathCU
 GrassPathCU.txt
@@ -205,6 +249,8 @@ e
 -1
 -1
 -1
+0
+n
 23
 GrassPathCD
 GrassPathCD.txt
@@ -214,6 +260,8 @@ e
 -1
 -1
 -1
+0
+n
 24
 GrassPathCL
 GrassPathCL.txt
@@ -223,6 +271,8 @@ e
 -1
 -1
 -1
+0
+n
 25
 GrassPathCR
 GrassPathCR.txt
@@ -232,6 +282,8 @@ e
 -1
 -1
 -1
+0
+n
 26
 BrickWindow
 BrickWindow.txt
@@ -241,6 +293,8 @@ e
 -1
 -1
 -1
+0
+n
 27
 NewTile
 NewTile.txt
@@ -250,6 +304,8 @@ e
 -1
 -1
 -1
+0
+n
 28
 NewTile2
 NewTile2.txt
@@ -259,6 +315,8 @@ e
 -1
 -1
 -1
+0
+n
 29
 NPC1
 NPC1.txt
@@ -269,6 +327,8 @@ n
 -1
 1
 30
+u
+30
 TalkBox
 TalkBox.txt
 e
@@ -277,3 +337,5 @@ e
 -1
 -1
 -1
+0
+n

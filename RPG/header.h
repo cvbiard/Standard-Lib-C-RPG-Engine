@@ -41,6 +41,13 @@ struct tile
 	char* file;
 	int warp[2];
 	int msg_id;
+	int ui_id;
+	char ui_dir; //'u', 'd', 'l', or 'r' for up, down, left, or right respectively.
+};
+struct message
+{
+    int id;
+    char* text;
 };
 
 
@@ -49,11 +56,12 @@ void mapping(int tile_map[(height*width)][(tile_height*tile_width)], int screen_
 void screen_manager(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile_width)], struct tile* Tiles, int tile_ids[width][height], int tile_frequency[(width*height)], int *linear_ids, int pos, char player_tile[(tile_width*tile_height)], int screen_size);
 void print_screen(int *scrstr, int screen_size);
 void load_scene(struct asset* scenes, int tile_ids[width][height], int tile_frequency[(width*height)]);
-int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile_width)], int input, char player_tile[(tile_width*tile_height)], int *linear_ids, struct tile* Tiles, struct asset* scenes, int tile_ids[width][height], int tile_frequency[(width*height)], struct object *player, int screen_size, int msg[1]);
+int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile_width)], int input, char player_tile[(tile_width*tile_height)], int *linear_ids, struct tile* Tiles, struct asset* scenes, int tile_ids[width][height], int tile_frequency[(width*height)], struct object *player, int screen_size, int *msg);
 void print_menu(char text[]);
 void get_frequency(int tile_ids[width][height], int tile_frequency[(width*height)]);
 void debug_printer(int number);
 void read_tiles(int amount, struct tile* Tiles);
 void read_scenes(int amount, struct asset* scenes);
 void ui_manager(int *scrstr, int *bgmap, int pos, struct tile element, int operation, int tile_map[(height*width)][(tile_height*tile_width)]);
-void read_message(int id);
+void read_messages(int amount, struct message* Messages);
+void display_message(int id, struct message* Messages);

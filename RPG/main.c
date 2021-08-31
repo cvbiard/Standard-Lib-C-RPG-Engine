@@ -4,7 +4,7 @@
 /*STANDARD C LIBRARY RPG ENGINE by Clark Biard
  * This software is currently in development, but free to use for any purpose! Documentation coming soon.
  * Contact: cvbiard@hotmail.com
- * Version: 0.0.1
+ * Version: 0.0.2
  * Notes: Currently cleaning up and implementing features for UI elements. Elements can be displayed over the background tiles, but I would like tiles to be able to have associated UI elements (for example, a speech box
  * over an NPC's head) that will just be there automatically with some flags on the NPC's tile.
 */
@@ -18,11 +18,12 @@ int main(void)
     int scr_size = calc_screen_size(1);
 
     //msg is the id of the text phrase to be printed in the text box. It needs to be a pointer but I haven't done that yet oops.
-    int msg[1] = {0};
+    int msg = 0;
 
-    //Create tile_amount and scene_amount (the amount of tiles and scenes we should expect to read from files), then read out of the respective files.
+    //Create tile_amount, scene_amount, and msg_amount (the amount of tiles, scenes, and messages we should expect to read from files), then read out of the respective files.
     int tile_amount = 0;
     int scene_amount = 0;
+    int msg_amount = 0;
     FILE *ta = fopen("TileAmount.txt", "r");
     fscanf(ta, "%d", &tile_amount);
     fclose(ta);
@@ -31,6 +32,10 @@ int main(void)
     fscanf(sa, "%d", &scene_amount);
     fclose(sa);
     printf("%d\n", scene_amount);
+    FILE *ma = fopen("MessageAmount.txt", "r");
+    fscanf(ma, "%d", &msg_amount);
+    fclose(ma);
+    printf("%d\n", msg_amount);
 
     //Create the input variable to store player input in.
 	int input = 0;
@@ -75,7 +80,7 @@ int main(void)
     //Debug prints all the tile data we just read in.
     for(int i = 0; i < tile_amount; i++)
     {
-        printf("%d\n%s\n%s\n%c\n%c\n%c\n%d\n%d\n",(Tiles+i)->id, (Tiles+i)->name, (Tiles+i)->file, (Tiles+i)->flags[0], (Tiles+i)->flags[1], (Tiles+i)->flags[2], (Tiles+i)->warp[0], (Tiles+i)->warp[1]);
+        printf("%d\n%s\n%s\n%c\n%c\n%c\n%d\n%d\n%d\n%c\n",(Tiles+i)->id, (Tiles+i)->name, (Tiles+i)->file, (Tiles+i)->flags[0], (Tiles+i)->flags[1], (Tiles+i)->flags[2], (Tiles+i)->warp[0], (Tiles+i)->warp[1], (Tiles+i)->ui_id, (Tiles+i)->ui_dir);
     }
 
 
@@ -99,6 +104,12 @@ int main(void)
 
     //Again reading from a file is nice because it allows for scene creation without having to rebuild.
     read_scenes(scene_amount, scenes);
+
+    //Once more, like Tiles and scenes, for messages
+    struct message* Messages = (struct message*) malloc(msg_amount*sizeof(struct message));
+
+    //Read from file
+    read_messages(msg_amount, Messages);
 
     //Little debug print to let me know I got out of the initialization
     if(debug == 't')
@@ -125,14 +136,15 @@ int main(void)
 
     //Prints the screen and menu below it.
     print_screen(scrstr, scr_size);
-    read_message(msg[0]);
+    display_message(0, Messages);
 
 
 
     //The main gameplay loop.
 	while (exit != 1)
 	{
-        //Get input from the player. Using system command because it doesn't require pressing enter after an input like scanf does.
+        //Get input from the player. Using system command because it doesn't require pressing enter after an input like scanf does. The return value is an integer starting from 1 of what key was
+        //pressed in the order they were listed. For example, if the user entered w, we would get 1. If they entered p, we would get 5.
 		input = system("CHOICE /N /C:wasdprtui");
 
 		//Exit input
@@ -160,23 +172,9 @@ int main(void)
             screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, player.pos, player_tile, scr_size);
         }
 
-        //Test ui draw
-        if(input == 8)
-        {
-            ui_manager(scrstr, bgmap, 88, *(Tiles+28), 0, tile_map);
-        }
-
-        //Test ui remove
-        if(input == 9)
-        {
-            ui_manager(scrstr, bgmap, 88, *(Tiles+28), 1, tile_map);
-        }
-
-        //Test ui draw for the npc on the first screen
-        ui_manager(scrstr, bgmap, 205, *(Tiles+30), 0, tile_map);
 
         //Processing player input into movement.
-        player.pos = move(scrstr, bgmap, tile_map, input, player_tile, linear_ids, Tiles, scenes, tile_ids, tile_frequency, &player, scr_size, msg);
+        player.pos = move(scrstr, bgmap, tile_map, input, player_tile, linear_ids, Tiles, scenes, tile_ids, tile_frequency, &player, scr_size, &msg);
 
         //Reset input
 		input = 0;
@@ -186,7 +184,7 @@ int main(void)
 
 		//Reprint the screen and menu with updated information
         print_screen(scrstr, scr_size);
-        read_message(msg[0]);
+        display_message(msg, Messages);
 
         //Debug print to show player position
         if(debug == 't')

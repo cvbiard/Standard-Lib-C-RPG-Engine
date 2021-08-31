@@ -185,9 +185,9 @@ void screen_manager(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_
 
         //Scrubs through tile_ids in order, and if any of them match ids with the currently loaded tile, uses the tile_map to write each line of the tile to the right position in the screen string.
         //This loop is for actually putting the current tile's characters in the right place on the scrstr.
+        //Also handled here is writing the ui layer. Checks the current tile's ui tags and if it has associated UI, we use ui_manager to write the ui layer on the tile in the specified direction.
        for (int m = 0; m <(width*height); m++)
        {
-
            if(linear_ids[m] == (Tiles+used_tiles[i])->id)
            {
                for(int p = 0; p<(tile_width*tile_height); p++)
@@ -201,11 +201,28 @@ void screen_manager(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_
                        scrstr[tile_map[m][p]] = (int)current[p];
                    }
                }
+               if((Tiles+used_tiles[i])->ui_id > 0)
+               {
+                   if((Tiles+used_tiles[i])->ui_dir == 'u')
+                   {
+                       ui_manager(scrstr, bgmap, (m-width), *(Tiles+(Tiles+used_tiles[i])->ui_id), 0, tile_map);
+                   }
+                   if((Tiles+used_tiles[i])->ui_dir == 'd')
+                   {
+                       ui_manager(scrstr, bgmap, (m+width), *(Tiles+(Tiles+used_tiles[i])->ui_id), 0, tile_map);
+                   }
+                   if((Tiles+used_tiles[i])->ui_dir == 'l')
+                   {
+                       ui_manager(scrstr, bgmap, (m-1), *(Tiles+(Tiles+used_tiles[i])->ui_id), 0, tile_map);
+                   }
+                   if((Tiles+used_tiles[i])->ui_dir == 'r')
+                   {
+                       ui_manager(scrstr, bgmap, (m+1), *(Tiles+(Tiles+used_tiles[i])->ui_id), 0, tile_map);
+                   }
+               }
            }
-
        }
     }
-
 
     //Updates the background map for future use to restore a tile on the screen that gets changed from moving tiles
     for (int i =0; i<screen_size; i++)
@@ -275,7 +292,7 @@ void load_scene(struct asset* scenes, int tile_ids[width][height], int tile_freq
 	fclose(scene_file);
 }
 //Handles everything related to movement, including collisions, warping (changing scene), and getting a message from a tile.
-int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile_width)], int input, char player_tile[(tile_width*tile_height)], int *linear_ids, struct tile* Tiles, struct asset* scenes, int tile_ids[width][height], int tile_frequency[(width*height)], struct object *player, int screen_size, int msg[1])
+int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile_width)], int input, char player_tile[(tile_width*tile_height)], int *linear_ids, struct tile* Tiles, struct asset* scenes, int tile_ids[width][height], int tile_frequency[(width*height)], struct object *player, int screen_size, int *msg)
 {
     //Linear movement to a 2D space
     //One space down is +10
@@ -332,12 +349,12 @@ int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile
             //Checking if the tile directly above us is an NPC. If so, access the message they give and print it.
             if((Tiles + linear_ids[((player->pos) - width)-width])->flags[2] == 'n')
             {
-                msg[0] = (Tiles + linear_ids[((player->pos) - width)-width])->msg_id;
+                *msg = (Tiles + linear_ids[((player->pos) - width)-width])->msg_id;
             }
             //If we don't need to print an NPC message, print a blank message.
             else
             {
-                msg[0] = 0;
+                *msg = 0;
             }
             //If we make it to this return, the player has successfully moved one tile upward. To set their position correctly, we return their previous position minus one width of the screen.
             return (player->pos) - width;
@@ -381,11 +398,11 @@ int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile
             //Check NPC for message
             if((Tiles + linear_ids[((player->pos) + width)-width])->flags[2] == 'n')
             {
-                msg[0] = (Tiles + linear_ids[((player->pos) + width)-width])->msg_id;
+                *msg = (Tiles + linear_ids[((player->pos) + width)-width])->msg_id;
             }
             else
             {
-                msg[0] = 0;
+                *msg = 0;
             }
             //Return new position
             return (player->pos) + width;
@@ -426,11 +443,11 @@ int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile
             //Check NPC message
             if((Tiles + linear_ids[((player->pos) - 1)-width])->flags[2] == 'n')
             {
-                msg[0] = (Tiles + linear_ids[((player->pos) - 1)-width])->msg_id;
+                *msg = (Tiles + linear_ids[((player->pos) - 1)-width])->msg_id;
             }
             else
             {
-                msg[0] = 0;
+                *msg = 0;
             }
             //Return new position
             return (player->pos) - 1;
@@ -471,11 +488,11 @@ int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile
             //Check NPC message
             if((Tiles + linear_ids[((player->pos) + 1)-width])->flags[2] == 'n')
             {
-                msg[0] = (Tiles + linear_ids[((player->pos) +1)-width])->msg_id;
+                *msg = (Tiles + linear_ids[((player->pos) +1)-width])->msg_id;
             }
             else
             {
-                msg[0] = 0;
+                *msg = 0;
             }
             //Return new position
             return (player->pos) + 1;
@@ -583,9 +600,11 @@ void read_tiles(int amount, struct tile* Tiles)
         int warp2 = 0;
         int id = 0;
         int msg = 0;
+        int ui_id = 0;
+        char ui_dir = '\0';
 
         //Read into variable
-        fscanf(index, "%d\n%s\n%s\n%c\n%c\n%c\n%d\n%d\n%d\n", &id, &name, &file, &flag1, &flag2, &flag3, &warp1, &warp2, &msg);
+        fscanf(index, "%d\n%s\n%s\n%c\n%c\n%c\n%d\n%d\n%d\n%d\n%c\n", &id, &name, &file, &flag1, &flag2, &flag3, &warp1, &warp2, &msg, &ui_id, &ui_dir);
 
         //Set id
         (Tiles+i)->id = id;
@@ -605,6 +624,8 @@ void read_tiles(int amount, struct tile* Tiles)
         (Tiles+i)->warp[0] = warp1;
         (Tiles+i)->warp[1] = warp2;
         (Tiles+i)->msg_id = msg;
+        (Tiles+i)->ui_id = ui_id;
+        (Tiles+i)->ui_dir = ui_dir;
 
         //Clear the strings for the next round
         memset(name, 0, sizeof(char)*strlen(name));
@@ -701,18 +722,35 @@ void ui_manager(int *scrstr, int *bgmap, int pos, struct tile element, int opera
         }
     }
 }
-//Handles storing and reading messages to be displayed in the text box at the bottom of the screen
-void read_message(int id)
+//Handles reading in messages from text file
+void read_messages(int amount, struct message* Messages)
 {
-    //Local variables for now, need to work on actually getting these from a file instead of keeping them on the stack
-    char message[MAX_MSG_SIZE] = " ";
-    char message2[MAX_MSG_SIZE] = "This is a test message from me, a test NPC!";
-    char msg_index[5][MAX_MSG_SIZE];
+    FILE *messages = fopen("Messages.txt", "r");
+    char message[MAX_MSG_SIZE];
+    int id;
 
-    //Copy messages into index
-    strcpy(msg_index[0], message);
-    strcpy(msg_index[1], message2);
+    for(int i = 0; i<amount; i++)
+    {
+        fscanf(messages, "%d\n", &id);
+        fscanf(messages, "%[^\n]%*c", message);
 
-    //Print out the requested message
-    print_menu(msg_index[id]);
+        (Messages+i)->id = id;
+        Messages[i].text = malloc(sizeof(char) * strlen(message));
+
+        strcpy((Messages+i)->text, message);
+        memset(message, 0, sizeof(char)*strlen(message));
+    }
+
+}
+//Handles displaying a message to the menu
+void display_message(int id, struct message* Messages)
+{
+    if (id == 0)
+    {
+        print_menu(" ");
+    }
+    else
+    {
+        print_menu((Messages+id)->text);
+    }
 }
