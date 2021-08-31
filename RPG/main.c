@@ -4,7 +4,7 @@
 /*STANDARD C LIBRARY RPG ENGINE by Clark Biard
  * This software is currently in development, but free to use for any purpose! Documentation coming soon.
  * Contact: cvbiard@hotmail.com
- * Version: 0.0.2
+ * Version: 0.0.2.1
  * Notes: Currently cleaning up and implementing features for UI elements. Elements can be displayed over the background tiles, but I would like tiles to be able to have associated UI elements (for example, a speech box
  * over an NPC's head) that will just be there automatically with some flags on the NPC's tile.
 */
