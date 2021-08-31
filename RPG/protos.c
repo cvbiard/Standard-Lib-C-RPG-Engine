@@ -880,3 +880,8 @@ void display_message(int id, struct message* Messages, char mode)
         print_menu((Messages+id)->text, mode);
     }
 }
+void clear_screen()
+{
+    printf("\x1b[%d;%df", 0, 0);
+    printf("\x1b[0J");
+}

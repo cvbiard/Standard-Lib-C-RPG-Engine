@@ -76,3 +76,4 @@ void read_scenes(int amount, struct asset* scenes);
 void ui_manager(int *scrstr, int *bgmap, int pos, struct tile element, int operation, int tile_map[(height*width)][(tile_height*tile_width)]);
 void read_messages(int amount, struct message* Messages);
 void display_message(int id, struct message* Messages, char mode);
+void clear_screen();

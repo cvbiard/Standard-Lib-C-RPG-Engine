@@ -4,8 +4,8 @@
 /*STANDARD C LIBRARY RPG ENGINE by Clark Biard
  * This software is currently in development, but free to use for any purpose! Documentation coming soon.
  * Contact: cvbiard@hotmail.com
- * Version: 0.0.3
- * Notes: Full color implemented with mode p. At this point, I think I need to just start working on building a game with these tools.
+ * Version: 0.0.3.1
+ * Notes: Full color implemented with mode p. Now that I have some experience with ANSI escape codes, I'm looking into using them for faster clearing/printing.
 */
 
 
@@ -14,6 +14,7 @@ int main(void)
 
     //Initializing the game
     char mode = 'p';
+
     //First, we need to calculate the size of the screen in terms of individual characters for future use. The argument for calc_screen_size is a boolean for whether or not we want a border of pound signs around the screen.
     int scr_size = calc_screen_size(1);
 
@@ -136,6 +137,8 @@ int main(void)
     screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, player.pos, player_tile, scr_size, mode);
 
 
+    clear_screen();
+
     //Prints the screen and menu below it.
     print_screen(scrstr, scr_size, mode);
     display_message(0, Messages, mode);
@@ -183,7 +186,7 @@ int main(void)
 		input = 0;
 
 		//Clear the previous step display
-		system("cls");
+		clear_screen();
 
 		//Reprint the screen and menu with updated information
         print_screen(scrstr, scr_size, mode);
