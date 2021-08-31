@@ -28,7 +28,8 @@ int calc_screen_size(int border)
 void mapping(int tile_map[(height*width)][(tile_height*tile_width)], int screen_size)
 {
     //Create a temporary 1D array to use for calculation
-    int *screen_mapping = (int)malloc(screen_size * sizeof(int));
+    int *screen_mapping = malloc(screen_size * sizeof(int*));
+    memset(screen_mapping, 0, screen_size * sizeof(int*));
 
     //Create a counter to use for translating 2D to 1D
     int count = 0;
@@ -36,8 +37,12 @@ void mapping(int tile_map[(height*width)][(tile_height*tile_width)], int screen_
     //Writes the top border positions.
     for (int i = 0; i < ((width*tile_width)+2); i++)
     {
-        *(screen_mapping + count) = (width*height)+2;
+        screen_mapping[count] = (width*height)+2;
         count = count + 1;
+        if (count>screen_size)
+        {
+            printf("FUCK1\n");
+        }
     }
 
     //This loop maps is the meat of this function.
@@ -46,28 +51,44 @@ void mapping(int tile_map[(height*width)][(tile_height*tile_width)], int screen_
         for (int k = 0; k < tile_height; k++)
         {
             //Writes the left border positions for this line.
-           *(screen_mapping + count) = (width*height)+2;
+           screen_mapping[count] = (width*height)+2;
             count = count + 1;
+            if (count>screen_size)
+            {
+                printf("FUCK2\n");
+            }
 
             //Writes the actual mapping position.
             for (int i = 0 + (l*width); i < width+(l*width); i++)
             {
                 for (int j = 0; j < tile_width; j++) {
-                    *(screen_mapping + count) = i;
+                    screen_mapping[count] = i;
                     count = count+1;
+                    if (count>screen_size)
+                    {
+                        printf("FUCK3\n");
+                    }
                 }
             }
             //Writes the right border positions for this line.
-            *(screen_mapping + count) = (width*height)+2;
+            screen_mapping[count] = (width*height)+2;
             count = count+1;
+            if (count>screen_size)
+            {
+                printf("FUCK4\n");
+            }
         }
     }
 
     //Writes the bottom border positions.
     for (int i = (screen_size - ((width*tile_width)+2)); i < screen_size; i++)
     {
-        *(screen_mapping + count) = (width*height)+2;
+        screen_mapping[count] = (width*height)+2;
         count = count + 1;
+        if (count>screen_size)
+        {
+            printf("FUCK5\n");
+        }
     }
 
     //Sets the tile map to 0
@@ -79,19 +100,22 @@ void mapping(int tile_map[(height*width)][(tile_height*tile_width)], int screen_
         }
     }
 
+    debug_printer(2);
+
+
     //Runs through the tile map and writes the tile number to all positions where that tile would occupy. For example, if our screen was 4 tiles by 2 tiles, and each tile was 2 characters by 2 characters,
     //This loop would leave tile_map looking like this:
     //00112233
     //00112233
     //44556677
     //44556677
-    for (int i = 0; i<screen_size; i++)
+    for (int q = 0; q < screen_size; q++)
     {
         for(int j = 0; j<(tile_height*tile_width); j++)
         {
-            if (tile_map[*(screen_mapping+i)][j] == 0)
+            if (tile_map[screen_mapping[q]][j] == 0)
             {
-                tile_map[*(screen_mapping+i)][j] = i;
+                tile_map[screen_mapping[q]][j] = q;
                 break;
             }
         }
@@ -253,7 +277,7 @@ void screen_manager(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_
 
 }
 //Prints the screen
-void print_screen(int *scrstr, int screen_size)
+void print_screen(int *scrstr, int screen_size, char mode)
 {
 
     //line_pos is created to track when we need to print a newline
@@ -262,12 +286,48 @@ void print_screen(int *scrstr, int screen_size)
     //Runs through the scrstr printing the ints as characters, and inserting a newline when we've hit the end of a line.
     for(int i = 0; i<screen_size;i++)
     {
-        if((char)scrstr[i] == '~')
+
+        if(mode == 'p')
         {
-            printf(ANSI_COLOR_GREEN" " ANSI_COLOR_RESET);
+            switch((char)scrstr[i])
+            {
+                case 'H': printf(BLACK" "RESET);
+                break;
+                case 'R': printf(DARK_RED" "RESET);
+                break;
+                case 'G': printf(DARK_GREEN" "RESET);
+                break;
+                case 'Y': printf(DARK_YELLOW" "RESET);
+                break;
+                case 'B': printf(DARK_BLUE" "RESET);
+                break;
+                case 'M': printf(DARK_MAGENTA" "RESET);
+                break;
+                case 'C': printf(DARK_CYAN" "RESET);
+                break;
+                case 'W': printf(DARK_WHITE" "RESET);
+                break;
+                case 'h': printf(BRIGHT_BLACK" "RESET);
+                break;
+                case 'r': printf(BRIGHT_RED" "RESET);
+                break;
+                case 'g': printf(BRIGHT_GREEN" "RESET);
+                break;
+                case 'y': printf(BRIGHT_YELLOW" "RESET);
+                break;
+                case 'b': printf(BRIGHT_BLUE" "RESET);
+                break;
+                case 'm': printf(BRIGHT_MAGENTA" "RESET);
+                break;
+                case 'c': printf(BRIGHT_CYAN" "RESET);
+                break;
+                case 'w': printf(WHITE" "RESET);
+                break;
+                default : printf("%c", (char)scrstr[i]);
+            }
         }
         else
-            {
+        {
             printf( "%c", (char)scrstr[i]);
         }
 

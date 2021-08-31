@@ -4,7 +4,7 @@
 /*STANDARD C LIBRARY RPG ENGINE by Clark Biard
  * This software is currently in development, but free to use for any purpose! Documentation coming soon.
  * Contact: cvbiard@hotmail.com
- * Version: 0.0.2.1
+ * Version: 0.0.2.2
  * Notes: Currently cleaning up and implementing features for UI elements. Elements can be displayed over the background tiles, but I would like tiles to be able to have associated UI elements (for example, a speech box
  * over an NPC's head) that will just be there automatically with some flags on the NPC's tile.
 */
@@ -14,6 +14,7 @@ int main(void)
 {
 
     //Initializing the game
+    char mode = 'p';
     //First, we need to calculate the size of the screen in terms of individual characters for future use. The argument for calc_screen_size is a boolean for whether or not we want a border of pound signs around the screen.
     int scr_size = calc_screen_size(1);
 
@@ -53,6 +54,8 @@ int main(void)
     int tile_map[(height*width)][(tile_height*tile_width)] = {0};
     mapping(tile_map, scr_size);
 
+    debug_printer(1);
+
     //TextText is a test message
 	char TestText[] = "This is test text, and I'm making it long to see what happens :)";
 
@@ -65,7 +68,7 @@ int main(void)
 
     //create the player object and assign a default position
     struct object player;
-    player.pos = 50;
+    player.pos = 3;
 
     //create the player tile. I figure it's easier to do here instead of along with the other tiles since we will always need it.
     char player_tile[(tile_width*tile_height)];
@@ -135,8 +138,8 @@ int main(void)
 
 
     //Prints the screen and menu below it.
-    print_screen(scrstr, scr_size);
-    display_message(0, Messages);
+    print_screen(scrstr, scr_size, mode);
+    //display_message(0, Messages);
 
 
 
@@ -183,13 +186,13 @@ int main(void)
 		system("cls");
 
 		//Reprint the screen and menu with updated information
-        print_screen(scrstr, scr_size);
-        display_message(msg, Messages);
+        print_screen(scrstr, scr_size, mode);
+        //display_message(msg, Messages);
 
         //Debug print to show player position
         if(debug == 't')
         {
-            printf("Player position is %d.\n", player.pos);
+            //printf("Player position is %d.\n", player.pos);
         }
 	}
 

@@ -1,9 +1,9 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#define height 20
-#define width 20
-#define tile_width 4
-#define tile_height 2
+#define height 14
+#define width 28
+#define tile_width 8
+#define tile_height 4
 #define debug 't'
 #define MAX_NAME_SIZE 32
 #define MAX_MSG_SIZE 64
@@ -12,13 +12,23 @@
 #define trans_symbol 'X'
 #define blank_symbol 'x'
 
-#define ANSI_COLOR_RED     "\x1b[31m"
-#define ANSI_COLOR_GREEN   "\x1b[102m"
-#define ANSI_COLOR_YELLOW  "\x1b[33m"
-#define ANSI_COLOR_BLUE    "\x1b[34m"
-#define ANSI_COLOR_MAGENTA "\x1b[35m"
-#define ANSI_COLOR_CYAN    "\x1b[36m"
-#define ANSI_COLOR_RESET   "\x1b[0m"
+#define BLACK "\x1b[40m"
+#define DARK_RED "\x1b[41m"
+#define DARK_GREEN "\x1b[42m"
+#define DARK_YELLOW "\x1b[43m"
+#define DARK_BLUE "\x1b[44m"
+#define DARK_MAGENTA "\x1b[45m"
+#define DARK_CYAN "\x1b[46m"
+#define DARK_WHITE "\x1b[47m"
+#define BRIGHT_BLACK "\x1b[100m"
+#define BRIGHT_RED "\x1b[101m"
+#define BRIGHT_GREEN "\x1b[102m"
+#define BRIGHT_YELLOW "\x1b[103m"
+#define BRIGHT_BLUE "\x1b[104m"
+#define BRIGHT_MAGENTA "\x1b[105m"
+#define BRIGHT_CYAN "\x1b[106m"
+#define WHITE "\x1b[107m"
+#define RESET "\x1b[0m"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,7 +64,7 @@ struct message
 int calc_screen_size(int border);
 void mapping(int tile_map[(height*width)][(tile_height*tile_width)], int screen_size);
 void screen_manager(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile_width)], struct tile* Tiles, int tile_ids[width][height], int tile_frequency[(width*height)], int *linear_ids, int pos, char player_tile[(tile_width*tile_height)], int screen_size);
-void print_screen(int *scrstr, int screen_size);
+void print_screen(int *scrstr, int screen_size, char mode);
 void load_scene(struct asset* scenes, int tile_ids[width][height], int tile_frequency[(width*height)]);
 int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile_width)], int input, char player_tile[(tile_width*tile_height)], int *linear_ids, struct tile* Tiles, struct asset* scenes, int tile_ids[width][height], int tile_frequency[(width*height)], struct object *player, int screen_size, int *msg);
 void print_menu(char text[]);
