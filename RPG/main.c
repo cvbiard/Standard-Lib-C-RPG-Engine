@@ -150,7 +150,7 @@ int main(void)
 	{
         //Get input from the player. Using system command because it doesn't require pressing enter after an input like scanf does. The return value is an integer starting from 1 of what key was
         //pressed in the order they were listed. For example, if the user entered w, we would get 1. If they entered p, we would get 5.
-		input = system("CHOICE /N /C:wasdprtui");
+		input = system("CHOICE /N /C:wasdprtuik");
 
 		//Exit input
 		if (input == 5)
@@ -175,9 +175,15 @@ int main(void)
             load_scene((scenes+0), tile_ids, tile_frequency);
             get_frequency(tile_ids, tile_frequency);
             screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, player.pos, player_tile, scr_size, mode);
-            ui_manager(scrstr, bgmap, 199, *(Tiles+1), 1, tile_map);
+
         }
 
+        if(input == 10)
+        {
+            printf("\x1b[%d;%df", 20, 20);
+            printf("HI");
+            system("PAUSE");
+        }
 
         //Processing player input into movement.
         player.pos = move(scrstr, bgmap, tile_map, input, player_tile, linear_ids, Tiles, scenes, tile_ids, tile_frequency, &player, scr_size, &msg, mode);

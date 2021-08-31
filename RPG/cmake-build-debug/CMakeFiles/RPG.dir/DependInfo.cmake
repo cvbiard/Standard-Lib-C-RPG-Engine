@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "C:/Users/Clark/Desktop/Standard Lib C RPG Engine/Standard-Lib-C-RPG-Engine/RPG/main.c" "C:/Users/Clark/Desktop/Standard Lib C RPG Engine/Standard-Lib-C-RPG-Engine/RPG/cmake-build-debug/CMakeFiles/RPG.dir/main.c.obj"
-  "C:/Users/Clark/Desktop/Standard Lib C RPG Engine/Standard-Lib-C-RPG-Engine/RPG/protos.c" "C:/Users/Clark/Desktop/Standard Lib C RPG Engine/Standard-Lib-C-RPG-Engine/RPG/cmake-build-debug/CMakeFiles/RPG.dir/protos.c.obj"
+  "C:/Users/Clark/Desktop/Standard-Lib-C-RPG-Engine/RPG/main.c" "C:/Users/Clark/Desktop/Standard-Lib-C-RPG-Engine/RPG/cmake-build-debug/CMakeFiles/RPG.dir/main.c.obj"
+  "C:/Users/Clark/Desktop/Standard-Lib-C-RPG-Engine/RPG/protos.c" "C:/Users/Clark/Desktop/Standard-Lib-C-RPG-Engine/RPG/cmake-build-debug/CMakeFiles/RPG.dir/protos.c.obj"
   )
 set(CMAKE_C_COMPILER_ID "MSVC")
 

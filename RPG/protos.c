@@ -39,10 +39,6 @@ void mapping(int tile_map[(height*width)][(tile_height*tile_width)], int screen_
     {
         screen_mapping[count] = (width*height)+2;
         count = count + 1;
-        if (count>screen_size)
-        {
-            printf("FUCK1\n");
-        }
     }
 
     //This loop maps is the meat of this function.
@@ -53,10 +49,6 @@ void mapping(int tile_map[(height*width)][(tile_height*tile_width)], int screen_
             //Writes the left border positions for this line.
            screen_mapping[count] = (width*height)+2;
             count = count + 1;
-            if (count>screen_size)
-            {
-                printf("FUCK2\n");
-            }
 
             //Writes the actual mapping position.
             for (int i = 0 + (l*width); i < width+(l*width); i++)
@@ -64,19 +56,11 @@ void mapping(int tile_map[(height*width)][(tile_height*tile_width)], int screen_
                 for (int j = 0; j < tile_width; j++) {
                     screen_mapping[count] = i;
                     count = count+1;
-                    if (count>screen_size)
-                    {
-                        printf("FUCK3\n");
-                    }
                 }
             }
             //Writes the right border positions for this line.
             screen_mapping[count] = (width*height)+2;
             count = count+1;
-            if (count>screen_size)
-            {
-                printf("FUCK4\n");
-            }
         }
     }
 
@@ -85,10 +69,6 @@ void mapping(int tile_map[(height*width)][(tile_height*tile_width)], int screen_
     {
         screen_mapping[count] = (width*height)+2;
         count = count + 1;
-        if (count>screen_size)
-        {
-            printf("FUCK5\n");
-        }
     }
 
     //Sets the tile map to 0
@@ -300,37 +280,69 @@ void print_screen(int *scrstr, int screen_size, char mode)
         {
             switch((char)scrstr[i])
             {
-                case 'H': printf(BLACK" "RESET);
+                case 'H': printf(BLACK);
+                putchar(' ');
+                printf(RESET);
                 break;
-                case 'R': printf(DARK_RED" "RESET);
+                case 'R': printf(DARK_RED);
+                    putchar(' ');
+                    printf(RESET);
                 break;
-                case 'G': printf(DARK_GREEN" "RESET);
+                case 'G': printf(DARK_GREEN);
+                    putchar(' ');
+                    printf(RESET);
                 break;
-                case 'Y': printf(DARK_YELLOW" "RESET);
+                case 'Y': printf(DARK_YELLOW);
+                    putchar(' ');
+                    printf(RESET);
                 break;
-                case 'B': printf(DARK_BLUE" "RESET);
+                case 'B': printf(DARK_BLUE);
+                    putchar(' ');
+                    printf(RESET);
                 break;
-                case 'M': printf(DARK_MAGENTA" "RESET);
+                case 'M': printf(DARK_MAGENTA);
+                    putchar(' ');
+                    printf(RESET);
                 break;
-                case 'C': printf(DARK_CYAN" "RESET);
+                case 'C': printf(DARK_CYAN);
+                    putchar(' ');
+                    printf(RESET);
                 break;
-                case 'W': printf(DARK_WHITE" "RESET);
+                case 'W': printf(DARK_WHITE);
+                    putchar(' ');
+                    printf(RESET);
                 break;
-                case 'h': printf(BRIGHT_BLACK" "RESET);
+                case 'h': printf(BRIGHT_BLACK);
+                    putchar(' ');
+                    printf(RESET);
                 break;
-                case 'r': printf(BRIGHT_RED" "RESET);
+                case 'r': printf(BRIGHT_RED);
+                    putchar(' ');
+                    printf(RESET);
                 break;
-                case 'g': printf(BRIGHT_GREEN" "RESET);
+                case 'g': printf(BRIGHT_GREEN);
+                    putchar(' ');
+                    printf(RESET);
                 break;
-                case 'y': printf(BRIGHT_YELLOW" "RESET);
+                case 'y': printf(BRIGHT_YELLOW);
+                    putchar(' ');
+                    printf(RESET);
                 break;
-                case 'b': printf(BRIGHT_BLUE" "RESET);
+                case 'b': printf(BRIGHT_BLUE);
+                    putchar(' ');
+                    printf(RESET);
                 break;
-                case 'm': printf(BRIGHT_MAGENTA" "RESET);
+                case 'm': printf(BRIGHT_MAGENTA);
+                    putchar(' ');
+                    printf(RESET);
                 break;
-                case 'c': printf(BRIGHT_CYAN" "RESET);
+                case 'c': printf(BRIGHT_CYAN);
+                    putchar(' ');
+                    printf(RESET);
                 break;
-                case 'w': printf(WHITE" "RESET);
+                case 'w': printf(WHITE);
+                    putchar(' ');
+                    printf(RESET);
                 break;
                 default : printf("%c", (char)scrstr[i]);
             }
