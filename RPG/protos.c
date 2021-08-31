@@ -126,9 +126,8 @@ void mapping(int tile_map[(height*width)][(tile_height*tile_width)], int screen_
     free(screen_mapping);
 
 }
-
 //Writes scene specific information to the screen string so that we don't have to do it every time we print the screen.
-void screen_manager(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile_width)], struct tile* Tiles, int tile_ids[width][height], int tile_frequency[(width*height)], int *linear_ids, int pos, char player_tile[(tile_width*tile_height)], int screen_size)
+void screen_manager(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile_width)], struct tile* Tiles, int tile_ids[width][height], int tile_frequency[(width*height)], int *linear_ids, int pos, char player_tile[(tile_width*tile_height)], int screen_size, char mode)
 {
     //unique_count is for counting how many unique tiles are being used. If we only had 2 tiles and they were both id 2, unique_count would be 1. If we had two tiles and they were id 1 and id 2, unique_count would be 2.
     int unique_count = 0;
@@ -152,7 +151,14 @@ void screen_manager(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_
     //Sets the whole screen to # (35). Safety measure.
     for(int i = 0; i<screen_size; i++)
     {
-        scrstr[i] = 35;
+        if(mode == 'p')
+        {
+            scrstr[i] = 104;
+        }
+        else{
+            scrstr[i] = 35;
+        }
+
     }
 
     //Log the ID of each unique tile that will need to be loaded, as well as count how many
@@ -209,7 +215,6 @@ void screen_manager(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_
 
         //Scrubs through tile_ids in order, and if any of them match ids with the currently loaded tile, uses the tile_map to write each line of the tile to the right position in the screen string.
         //This loop is for actually putting the current tile's characters in the right place on the scrstr.
-        //Also handled here is writing the ui layer. Checks the current tile's ui tags and if it has associated UI, we use ui_manager to write the ui layer on the tile in the specified direction.
        for (int m = 0; m <(width*height); m++)
        {
            if(linear_ids[m] == (Tiles+used_tiles[i])->id)
@@ -225,25 +230,6 @@ void screen_manager(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_
                        scrstr[tile_map[m][p]] = (int)current[p];
                    }
                }
-               if((Tiles+used_tiles[i])->ui_id > 0)
-               {
-                   if((Tiles+used_tiles[i])->ui_dir == 'u')
-                   {
-                       ui_manager(scrstr, bgmap, (m-width), *(Tiles+(Tiles+used_tiles[i])->ui_id), 0, tile_map);
-                   }
-                   if((Tiles+used_tiles[i])->ui_dir == 'd')
-                   {
-                       ui_manager(scrstr, bgmap, (m+width), *(Tiles+(Tiles+used_tiles[i])->ui_id), 0, tile_map);
-                   }
-                   if((Tiles+used_tiles[i])->ui_dir == 'l')
-                   {
-                       ui_manager(scrstr, bgmap, (m-1), *(Tiles+(Tiles+used_tiles[i])->ui_id), 0, tile_map);
-                   }
-                   if((Tiles+used_tiles[i])->ui_dir == 'r')
-                   {
-                       ui_manager(scrstr, bgmap, (m+1), *(Tiles+(Tiles+used_tiles[i])->ui_id), 0, tile_map);
-                   }
-               }
            }
        }
     }
@@ -252,6 +238,29 @@ void screen_manager(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_
     for (int i =0; i<screen_size; i++)
     {
         bgmap[i] = scrstr[i];
+    }
+
+    //Now that bgmap is ready to be accessed to restore tiles, we can draw the UI layer.
+    for(int k = 0; k<unique_count; k++)
+    {
+        for (int m = 0; m <(width*height); m++) {
+            if (linear_ids[m] == (Tiles + used_tiles[k])->id) {
+                if ((Tiles + used_tiles[k])->ui_id > 0) {
+                    if ((Tiles + used_tiles[k])->ui_dir == 'u') {
+                        ui_manager(scrstr, bgmap, (m - width), *(Tiles + (Tiles + used_tiles[k])->ui_id), 0, tile_map);
+                    }
+                    if ((Tiles + used_tiles[k])->ui_dir == 'd') {
+                        ui_manager(scrstr, bgmap, (m + width), *(Tiles + (Tiles + used_tiles[k])->ui_id), 0, tile_map);
+                    }
+                    if ((Tiles + used_tiles[k])->ui_dir == 'l') {
+                        ui_manager(scrstr, bgmap, (m - 1), *(Tiles + (Tiles + used_tiles[k])->ui_id), 0, tile_map);
+                    }
+                    if ((Tiles + used_tiles[k])->ui_dir == 'r') {
+                        ui_manager(scrstr, bgmap, (m + 1), *(Tiles + (Tiles + used_tiles[k])->ui_id), 0, tile_map);
+                    }
+                }
+            }
+        }
     }
 
     //Here is where the player tile is printed on to the string. We need to do this before the first time move() is run each scene so that the player appears the first time a scene is printed.
@@ -360,7 +369,7 @@ void load_scene(struct asset* scenes, int tile_ids[width][height], int tile_freq
 	fclose(scene_file);
 }
 //Handles everything related to movement, including collisions, warping (changing scene), and getting a message from a tile.
-int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile_width)], int input, char player_tile[(tile_width*tile_height)], int *linear_ids, struct tile* Tiles, struct asset* scenes, int tile_ids[width][height], int tile_frequency[(width*height)], struct object *player, int screen_size, int *msg)
+int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile_width)], int input, char player_tile[(tile_width*tile_height)], int *linear_ids, struct tile* Tiles, struct asset* scenes, int tile_ids[width][height], int tile_frequency[(width*height)], struct object *player, int screen_size, int *msg, char mode)
 {
     //Linear movement to a 2D space
     //One space down is +10
@@ -388,7 +397,7 @@ int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile
             get_frequency(tile_ids, tile_frequency);
 
             //Run screen_manager to load everything for the new scene.
-            screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, (Tiles + linear_ids[prewarppos - width])->warp[1], player_tile, screen_size);
+            screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, (Tiles + linear_ids[prewarppos - width])->warp[1], player_tile, screen_size, mode);
 
             //return the player's position for the next input cycle.
             return player->pos;
@@ -441,7 +450,7 @@ int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile
             player->pos = (Tiles + linear_ids[(player->pos) + width])->warp[1];
             load_scene((scenes+(Tiles + linear_ids[prewarppos + width])->warp[0]), tile_ids, tile_frequency);
             get_frequency(tile_ids, tile_frequency);
-            screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, (Tiles + linear_ids[prewarppos + width])->warp[1], player_tile, screen_size);
+            screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, (Tiles + linear_ids[prewarppos + width])->warp[1], player_tile, screen_size, mode);
             return player->pos;
         }
         if ((player->pos) + width <= ((width*height)-1) && (Tiles + linear_ids[(player->pos) + width])->flags[0]!= 'c')
@@ -486,7 +495,7 @@ int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile
             player->pos = (Tiles + linear_ids[(player->pos) - 1])->warp[1];
             load_scene((scenes+(Tiles + linear_ids[prewarppos - 1])->warp[0]), tile_ids, tile_frequency);
             get_frequency(tile_ids, tile_frequency);
-            screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, (Tiles + linear_ids[prewarppos - 1])->warp[1], player_tile, screen_size);
+            screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, (Tiles + linear_ids[prewarppos - 1])->warp[1], player_tile, screen_size, mode);
             return player->pos;
         }
         if ((player->pos) - 1 >= 0 && (player->pos)%width != 0 && (Tiles + linear_ids[(player->pos) - 1])->flags[0]!= 'c')
@@ -531,7 +540,7 @@ int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile
             player->pos = (Tiles + linear_ids[(player->pos) + 1])->warp[1];
             load_scene((scenes+(Tiles + linear_ids[prewarppos + 1])->warp[0]), tile_ids, tile_frequency);
             get_frequency(tile_ids, tile_frequency);
-            screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, (Tiles + linear_ids[prewarppos + 1])->warp[1], player_tile, screen_size);
+            screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, (Tiles + linear_ids[prewarppos + 1])->warp[1], player_tile, screen_size, mode);
             return player->pos;
         }
         if ((player->pos) + 1 >= 0 && (player->pos)%width != (width-1)  && (Tiles + linear_ids[(player->pos) + 1])->flags[0]!= 'c')
@@ -572,7 +581,7 @@ int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile
 
 }
 //Prints the text box and message inside at the bottom of the screen
-void print_menu(char text[])
+void print_menu(char text[], char mode)
 {
     //textdone is a boolean for whether or not we are done with printing text. textcounter counts how much text we have printed so far.
     int textdone = 0, textcounter = 0;
@@ -587,8 +596,16 @@ void print_menu(char text[])
         {
             printf(" ");
         }
-        else {
-            printf("_");
+        else
+            {
+            if(mode == 'p')
+            {
+                printf(BRIGHT_BLACK" "RESET);
+            }
+            else
+            {
+                printf("_");
+            }
         }
     }
     printf("\n");
@@ -601,19 +618,45 @@ void print_menu(char text[])
         {
             if (j == 0 || j == (width * tile_width) - 1)
             {
-                printf("|");
+                if(mode == 'p')
+                {
+                    printf(BRIGHT_BLACK" "RESET);
+                }
+                else
+                {
+                    printf("|");
+                }
             }
             else
                 {
                 if (text[textcounter] > 0 && text[textcounter] <= 127)
                 {
-                    if (textdone == 0) {
-                        printf("%c", text[textcounter]);
-                        textcounter = textcounter + 1;
-                    } else {
-                        printf(" ");
+                    if(mode == 'p')
+                    {
+                        if (textdone == 0) {
+                            printf(WHITE);
+                            printf(BLACK_TEXT"%c"RESET, text[textcounter]);
+                            textcounter = textcounter + 1;
+                        }
+                        else {
+                            printf(WHITE" "RESET);
+                        }
                     }
-                } else {
+                    else
+                    {
+                        if (textdone == 0) {
+                            printf("%c", text[textcounter]);
+                            textcounter = textcounter + 1;
+                        }
+                        else {
+                            printf(" ");
+                        }
+                    }
+                } else if(mode == 'p'){
+                    printf(WHITE" "RESET);
+                    textdone = 1;
+                }
+                else {
                     printf(" ");
                     textdone = 1;
                 }
@@ -623,14 +666,29 @@ void print_menu(char text[])
     }
 
     //Prints the bottom border
-    printf(" ");
-    for (int i = 0; i < (width * tile_width); i++) {
-        if (i == 0 || i == (width * tile_width) - 1) {
-            printf("|");
-        } else {
-            printf("_");
+    if(mode =='p')
+    {
+        printf(" ");
+        for (int i = 0; i < (width * tile_width); i++) {
+            if (i == 0 || i == (width * tile_width) - 1) {
+                printf(" ");
+            } else {
+                printf(BRIGHT_BLACK" "RESET);
+            }
         }
     }
+    else
+    {
+        printf(" ");
+        for (int i = 0; i < (width * tile_width); i++) {
+            if (i == 0 || i == (width * tile_width) - 1) {
+                printf("|");
+            } else {
+                printf("_");
+            }
+        }
+    }
+
     printf("\n");
 }
 //Gets the frequency of each tile in a scene
@@ -776,7 +834,7 @@ void ui_manager(int *scrstr, int *bgmap, int pos, struct tile element, int opera
             }
             else
             {
-                scrstr[tile_map[pos][i]] = (int) linear_element[i];
+                scrstr[tile_map[pos][i]] = (int)linear_element[i];
             }
         }
     }
@@ -811,14 +869,14 @@ void read_messages(int amount, struct message* Messages)
 
 }
 //Handles displaying a message to the menu
-void display_message(int id, struct message* Messages)
+void display_message(int id, struct message* Messages, char mode)
 {
     if (id == 0)
     {
-        print_menu(" ");
+        print_menu(" ", mode);
     }
     else
     {
-        print_menu((Messages+id)->text);
+        print_menu((Messages+id)->text, mode);
     }
 }

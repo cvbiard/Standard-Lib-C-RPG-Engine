@@ -4,9 +4,8 @@
 /*STANDARD C LIBRARY RPG ENGINE by Clark Biard
  * This software is currently in development, but free to use for any purpose! Documentation coming soon.
  * Contact: cvbiard@hotmail.com
- * Version: 0.0.2.2
- * Notes: Currently cleaning up and implementing features for UI elements. Elements can be displayed over the background tiles, but I would like tiles to be able to have associated UI elements (for example, a speech box
- * over an NPC's head) that will just be there automatically with some flags on the NPC's tile.
+ * Version: 0.0.3
+ * Notes: Full color implemented with mode p. At this point, I think I need to just start working on building a game with these tools.
 */
 
 
@@ -134,12 +133,12 @@ int main(void)
 
     //Running the screen manager. This function writes the correct tile characters to the correct place on scrstr and bgmap. Splitting this functionality from print_screen was very important, as doing this work every time
     //we needed to print the screen was super slow and buggy. This function essentially handles all work that needs to be done once per scene.
-    screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, player.pos, player_tile, scr_size);
+    screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, player.pos, player_tile, scr_size, mode);
 
 
     //Prints the screen and menu below it.
     print_screen(scrstr, scr_size, mode);
-    //display_message(0, Messages);
+    display_message(0, Messages, mode);
 
 
 
@@ -172,12 +171,13 @@ int main(void)
         {
             load_scene((scenes+0), tile_ids, tile_frequency);
             get_frequency(tile_ids, tile_frequency);
-            screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, player.pos, player_tile, scr_size);
+            screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, player.pos, player_tile, scr_size, mode);
+            ui_manager(scrstr, bgmap, 199, *(Tiles+1), 1, tile_map);
         }
 
 
         //Processing player input into movement.
-        player.pos = move(scrstr, bgmap, tile_map, input, player_tile, linear_ids, Tiles, scenes, tile_ids, tile_frequency, &player, scr_size, &msg);
+        player.pos = move(scrstr, bgmap, tile_map, input, player_tile, linear_ids, Tiles, scenes, tile_ids, tile_frequency, &player, scr_size, &msg, mode);
 
         //Reset input
 		input = 0;
@@ -187,12 +187,12 @@ int main(void)
 
 		//Reprint the screen and menu with updated information
         print_screen(scrstr, scr_size, mode);
-        //display_message(msg, Messages);
+        display_message(msg, Messages, mode);
 
         //Debug print to show player position
         if(debug == 't')
         {
-            //printf("Player position is %d.\n", player.pos);
+            printf("Player position is %d.\n", player.pos);
         }
 	}
 
