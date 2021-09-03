@@ -4,8 +4,9 @@
 /*STANDARD C LIBRARY RPG ENGINE by Clark Biard
  * This software is currently in development, but free to use for any purpose! Documentation coming soon.
  * Contact: cvbiard@hotmail.com
- * Version: 0.0.3.1
- * Notes: Full color implemented with mode p. Now that I have some experience with ANSI escape codes, I'm looking into using them for faster clearing/printing.
+ * Version: 0.0.4
+ * Notes: Fully implemented printing dynamic objects over the background with ANSI escapes. Took a while and there's a lot of things that are really clunky and need improvement, but for now
+ * I'm very proud of how fast the entire thing is. Definitely need better commenting throughout though.
 */
 
 
@@ -16,7 +17,7 @@ int main(void)
     char mode = 'p';
 
     //First, we need to calculate the size of the screen in terms of individual characters for future use. The argument for calc_screen_size is a boolean for whether or not we want a border of pound signs around the screen.
-    int scr_size = calc_screen_size(1);
+    int scr_size = calc_screen_size(0);
 
     //msg is the id of the text phrase to be printed in the text box. It needs to be a pointer but I haven't done that yet oops.
     int msg = 0;
@@ -49,10 +50,12 @@ int main(void)
 	//Allocate heap memory for linear ids, a one dimentional array for storing tile ids of the scene we are currently loading.
 	int linear_ids = (int) malloc((height*width) * sizeof(int));
 
+	int position_map[height][width] = {0};
+
 	//Create the tile map. This 2D array stores the 1D position of each character based on the screen string. For example, if we wanted to figure out where in scrstr the character being printed at 5, 4 on the screen is,
 	//we could access tile_map[5][4]. This is very useful for going from 2D to 1D, where 2D is easier to understand mentally, but 1D is much more efficient to work with and print.
     int tile_map[(height*width)][(tile_height*tile_width)] = {0};
-    mapping(tile_map, scr_size);
+    mapping(tile_map, scr_size, position_map);
 
     debug_printer(1);
 
@@ -68,10 +71,13 @@ int main(void)
 
     //create the player object and assign a default position
     struct object player;
-    player.pos = 3;
+    player.pos[0] = 0;
+    player.pos[1] = 0;
 
     //create the player tile. I figure it's easier to do here instead of along with the other tiles since we will always need it.
     char player_tile[(tile_width*tile_height)];
+
+    int position = 0;
 
     //Create and allocate memory for the array of tiles. This is where tile_amount is useful.
 	struct tile* Tiles = (struct tile*) malloc(tile_amount*sizeof(struct tile));
@@ -83,7 +89,7 @@ int main(void)
     //Debug prints all the tile data we just read in.
     for(int i = 0; i < tile_amount; i++)
     {
-        printf("%d\n%s\n%s\n%c\n%c\n%c\n%d\n%d\n%d\n%c\n",(Tiles+i)->id, (Tiles+i)->name, (Tiles+i)->file, (Tiles+i)->flags[0], (Tiles+i)->flags[1], (Tiles+i)->flags[2], (Tiles+i)->warp[0], (Tiles+i)->warp[1], (Tiles+i)->ui_id, (Tiles+i)->ui_dir);
+        printf("%d\n%s\n%s\n%c\n%c\n%c\n%d\n%d\n%d\n%d\n%c\n",(Tiles+i)->id, (Tiles+i)->name, (Tiles+i)->file, (Tiles+i)->flags[0], (Tiles+i)->flags[1], (Tiles+i)->flags[2], (Tiles+i)->warp[0], (Tiles+i)->warp[1], (Tiles+i)->warp[2], (Tiles+i)->ui_id, (Tiles+i)->ui_dir);
     }
 
 
@@ -114,6 +120,8 @@ int main(void)
     //Read from file
     read_messages(msg_amount, Messages);
 
+    int had_message = 0;
+
     //Little debug print to let me know I got out of the initialization
     if(debug == 't')
     {
@@ -134,10 +142,10 @@ int main(void)
 
     //Running the screen manager. This function writes the correct tile characters to the correct place on scrstr and bgmap. Splitting this functionality from print_screen was very important, as doing this work every time
     //we needed to print the screen was super slow and buggy. This function essentially handles all work that needs to be done once per scene.
-    screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, player.pos, player_tile, scr_size, mode);
+    screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, scr_size, mode);
 
 
-    clear_screen();
+    system("cls");
 
     //Prints the screen and menu below it.
     print_screen(scrstr, scr_size, mode);
@@ -174,7 +182,7 @@ int main(void)
         {
             load_scene((scenes+0), tile_ids, tile_frequency);
             get_frequency(tile_ids, tile_frequency);
-            screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, player.pos, player_tile, scr_size, mode);
+            screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, scr_size, mode);
 
         }
 
@@ -186,22 +194,22 @@ int main(void)
         }
 
         //Processing player input into movement.
-        player.pos = move(scrstr, bgmap, tile_map, input, player_tile, linear_ids, Tiles, scenes, tile_ids, tile_frequency, &player, scr_size, &msg, mode);
+        move(scrstr, bgmap, tile_map, input, player_tile, linear_ids, Tiles, scenes, tile_ids, tile_frequency, &player, scr_size, &msg, mode, position_map, Messages, &had_message);
 
         //Reset input
 		input = 0;
 
 		//Clear the previous step display
-		clear_screen();
+		//clear_screen();
 
 		//Reprint the screen and menu with updated information
-        print_screen(scrstr, scr_size, mode);
-        display_message(msg, Messages, mode);
+       // print_screen(scrstr, scr_size, mode);
+        //display_message(msg, Messages, mode);
 
         //Debug print to show player position
         if(debug == 't')
         {
-            printf("Player position is %d.\n", player.pos);
+            printf("Player position is row: %d, col: %d.\n", player.pos[0], player.pos[1]);
         }
 	}
 

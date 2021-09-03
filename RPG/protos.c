@@ -25,7 +25,7 @@ int calc_screen_size(int border)
 }
 //Maps where a character in a 2D array should be written to a 1D array. If we wanted to figure out where to write a character at 5, 4 on the 2D array to on the 1D array, after running this function we could access
 //tile_map[5][4]. Even better, we can just write to scrstr[tile_map[5][4]].
-void mapping(int tile_map[(height*width)][(tile_height*tile_width)], int screen_size)
+void mapping(int tile_map[(height*width)][(tile_height*tile_width)], int screen_size, int position_map[height][width])
 {
     //Create a temporary 1D array to use for calculation
     int *screen_mapping = malloc(screen_size * sizeof(int*));
@@ -34,22 +34,11 @@ void mapping(int tile_map[(height*width)][(tile_height*tile_width)], int screen_
     //Create a counter to use for translating 2D to 1D
     int count = 0;
 
-    //Writes the top border positions.
-    for (int i = 0; i < ((width*tile_width)+2); i++)
-    {
-        screen_mapping[count] = (width*height)+2;
-        count = count + 1;
-    }
-
     //This loop maps is the meat of this function.
     for(int l = 0; l <height; l++)
     {
         for (int k = 0; k < tile_height; k++)
         {
-            //Writes the left border positions for this line.
-           screen_mapping[count] = (width*height)+2;
-            count = count + 1;
-
             //Writes the actual mapping position.
             for (int i = 0 + (l*width); i < width+(l*width); i++)
             {
@@ -58,18 +47,9 @@ void mapping(int tile_map[(height*width)][(tile_height*tile_width)], int screen_
                     count = count+1;
                 }
             }
-            //Writes the right border positions for this line.
-            screen_mapping[count] = (width*height)+2;
-            count = count+1;
         }
     }
 
-    //Writes the bottom border positions.
-    for (int i = (screen_size - ((width*tile_width)+2)); i < screen_size; i++)
-    {
-        screen_mapping[count] = (width*height)+2;
-        count = count + 1;
-    }
 
     //Sets the tile map to 0
     for(int i = 0; i <(height*width); i++)
@@ -102,12 +82,22 @@ void mapping(int tile_map[(height*width)][(tile_height*tile_width)], int screen_
 
     }
 
+    int tick =0;
+    for(int i = 0; i<height;i++)
+    {
+        for(int j = 0; j<width;j++)
+        {
+            position_map[i][j] = tick;
+            tick = tick+1;
+        }
+    }
+
     //free our temporary 1D array
     free(screen_mapping);
 
 }
 //Writes scene specific information to the screen string so that we don't have to do it every time we print the screen.
-void screen_manager(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile_width)], struct tile* Tiles, int tile_ids[width][height], int tile_frequency[(width*height)], int *linear_ids, int pos, char player_tile[(tile_width*tile_height)], int screen_size, char mode)
+void screen_manager(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile_width)], struct tile* Tiles, int tile_ids[width][height], int tile_frequency[(width*height)], int *linear_ids, int screen_size, char mode)
 {
     //unique_count is for counting how many unique tiles are being used. If we only had 2 tiles and they were both id 2, unique_count would be 1. If we had two tiles and they were id 1 and id 2, unique_count would be 2.
     int unique_count = 0;
@@ -243,27 +233,6 @@ void screen_manager(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_
         }
     }
 
-    //Here is where the player tile is printed on to the string. We need to do this before the first time move() is run each scene so that the player appears the first time a scene is printed.
-    //On top of this, the player is it's own loop after the background since the player tile supports transparency, so we have to know what tile is behind the player before we add them to the string.
-    for(int i = 0; i < (tile_width*tile_height); i++)
-    {
-        //If we see a transparent symbol, use bgmap to find the character of the tile "behind" the player.
-        if(player_tile[i] == trans_symbol)
-        {
-            scrstr[tile_map[pos][i]] = bgmap[tile_map[pos][i]];
-        }
-        //If we hit a blank symbol, draw a space (32);
-        else if (player_tile[i] == blank_symbol)
-        {
-            scrstr[tile_map[pos][i]] = 32;
-        }
-        //If we hit any character that isn't transparent or blank, draw the correct character.
-        else
-        {
-            scrstr[tile_map[pos][i]] = (int) player_tile[i];
-        }
-    }
-
 }
 //Prints the screen
 void print_screen(int *scrstr, int screen_size, char mode)
@@ -352,7 +321,7 @@ void print_screen(int *scrstr, int screen_size, char mode)
             printf( "%c", (char)scrstr[i]);
         }
 
-        if(line_pos == (tile_width*width)+1)
+        if(line_pos == (tile_width*width)-1)
         {
             printf("\n");
             line_pos = -1;
@@ -381,216 +350,170 @@ void load_scene(struct asset* scenes, int tile_ids[width][height], int tile_freq
 	fclose(scene_file);
 }
 //Handles everything related to movement, including collisions, warping (changing scene), and getting a message from a tile.
-int move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile_width)], int input, char player_tile[(tile_width*tile_height)], int *linear_ids, struct tile* Tiles, struct asset* scenes, int tile_ids[width][height], int tile_frequency[(width*height)], struct object *player, int screen_size, int *msg, char mode)
+void move(int *scrstr, int *bgmap, int tile_map[(height*width)][(tile_height*tile_width)], int input, char player_tile[(tile_width*tile_height)], int *linear_ids, struct tile* Tiles, struct asset* scenes, int tile_ids[width][height], int tile_frequency[(width*height)], struct object *player, int screen_size, int *msg, char mode, int position_map[height][width], struct message *Messages, int *had_message)
 {
-    //Linear movement to a 2D space
-    //One space down is +10
-    //One space up is -10
-    //One space right is +1
-    //One left is -1
-
-    //A variable to hold the player's position before a warp.
-    int prewarppos = 0;
-
-    //If the input is w, we want to go up so we need to get information from the tile directly above the player.
-    if (input == 1)
+   int prewarppos[2] ={0};
+    if(input == 1)
     {
-        //Make sure the tile we want to go to is in bounds, and also check if it is a door (warp point).
-        if(((player->pos) - width) >= 0 && (Tiles + linear_ids[(player->pos) - width])->flags[1] == 'd')
+        if(player->pos[0]-1 >= 0 && (Tiles+((tile_ids[(player->pos[1])][(player->pos[0])-1])))->flags[0] != 'c')
         {
-            //If we are in bounds and we are going in to a door, store the position we were before the warp.
-            prewarppos = player->pos;
-
-            //Change the player's position to the post warp position (warp[1] of the warp tile we are stepping on)
-            player->pos = (Tiles + linear_ids[(player->pos) - width])->warp[1];
-
-            //Load the new scene we are warping in to. We access the id from the original tile we stepped on's warp[0].
-            load_scene((scenes+(Tiles + linear_ids[prewarppos - width])->warp[0]), tile_ids, tile_frequency);
-            get_frequency(tile_ids, tile_frequency);
-
-            //Run screen_manager to load everything for the new scene.
-            screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, (Tiles + linear_ids[prewarppos - width])->warp[1], player_tile, screen_size, mode);
-
-            //return the player's position for the next input cycle.
-            return player->pos;
-        }
-        //If the tile isn't a door, we need to make sure it is in bounds and doesn't have a collision flag (meaning we can't move there)
-        if (((player->pos) - width) >= 0 && (Tiles + linear_ids[((player->pos) - width)])->flags[0] != 'c')
-        {
-
-            //If the tile we want to go to is in bounds and isn't solid, we need to write the player tile to that position, and restore the background tile from the previous position with the info from bgmap.
-            for(int i = 0; i < (tile_width*tile_height); i++)
+            if((Tiles+((tile_ids[(player->pos[1])][(player->pos[0])-1])))->flags[1] == 'd')
             {
-                scrstr[tile_map[(player->pos)][i]] = bgmap[tile_map[(player->pos)][i]];
-                if(player_tile[i] == trans_symbol)
-                {
-                    scrstr[tile_map[(player->pos) - width][i]] = bgmap[tile_map[(player->pos) - width][i]];
-                }
-                else if (player_tile[i] == blank_symbol)
-                {
-                    scrstr[tile_map[(player->pos) - width][i]] = 32;
-                }
-                else
-                {
-                    scrstr[tile_map[(player->pos) -width][i]] = (int) player_tile[i];
-                }
-            }
-            //Checking if the tile directly above us is an NPC. If so, access the message they give and print it.
-            if((Tiles + linear_ids[((player->pos) - width)-width])->flags[2] == 'n')
-            {
-                *msg = (Tiles + linear_ids[((player->pos) - width)-width])->msg_id;
-            }
-            //If we don't need to print an NPC message, print a blank message.
-            else
-            {
-                *msg = 0;
-            }
-            //If we make it to this return, the player has successfully moved one tile upward. To set their position correctly, we return their previous position minus one width of the screen.
-            return (player->pos) - width;
-        }
-    }
-
-    //If the input is s, we need to check the information for the tile directly below the player.
-    if (input == 3)
-    {
-        //The only difference between other inputs and w is the direction we look for potential movement, and how we check bounds. There's no way to move down and get to an out of bounds position <0, so we only need to check
-        //above the maximum position. Besides that, the only difference is moving down a tile is adding one width to the position instead of subtracting it.
-        if((player->pos) + width <= ((width*height)-1) && (Tiles + linear_ids[(player->pos) + width])->flags[1] == 'd')
-        {
-            //If we hit a door
-            prewarppos = player->pos;
-            player->pos = (Tiles + linear_ids[(player->pos) + width])->warp[1];
-            load_scene((scenes+(Tiles + linear_ids[prewarppos + width])->warp[0]), tile_ids, tile_frequency);
-            get_frequency(tile_ids, tile_frequency);
-            screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, (Tiles + linear_ids[prewarppos + width])->warp[1], player_tile, screen_size, mode);
-            return player->pos;
-        }
-        if ((player->pos) + width <= ((width*height)-1) && (Tiles + linear_ids[(player->pos) + width])->flags[0]!= 'c')
-        {
-            //Draw player if we aren't colliding
-            for(int i = 0; i < (tile_width*tile_height); i++)
-            {
-                scrstr[tile_map[(player->pos)][i]] = bgmap[tile_map[(player->pos)][i]];
-                if(player_tile[i] == trans_symbol)
-                {
-                    scrstr[tile_map[(player->pos) + width][i]] = bgmap[tile_map[(player->pos) + width][i]];
-                }
-                else if (player_tile[i] == blank_symbol)
-                {
-                    scrstr[tile_map[(player->pos) + width][i]] = 32;
-                }
-                else
-                {
-                    scrstr[tile_map[(player->pos) + width][i]] = (int) player_tile[i];
-                }
-            }
-            //Check NPC for message
-            if((Tiles + linear_ids[((player->pos) + width)-width])->flags[2] == 'n')
-            {
-                *msg = (Tiles + linear_ids[((player->pos) + width)-width])->msg_id;
+                prewarppos[0] = player->pos[0];
+                prewarppos[1] = player->pos[1];
+                player->pos[0] = (Tiles+((tile_ids[(player->pos[1])][(player->pos[0])-1])))->warp[1];
+                player->pos[1] = (Tiles+((tile_ids[(prewarppos[1])][(prewarppos[0])-1])))->warp[2];
+                load_scene((scenes+(Tiles+((tile_ids[(prewarppos[1])][(prewarppos[0])-1])))->warp[0]), tile_ids, tile_frequency);
+                get_frequency(tile_ids, tile_frequency);
+                screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, screen_size, mode);
+                system("cls");
+                print_screen(scrstr, screen_size, mode);
+                display_message(0, Messages, mode);
+                print_player(player->pos, player_tile);
             }
             else
             {
-                *msg = 0;
+                restore_to_pos(player->pos, scrstr, tile_map, position_map);
+                player->pos[0] = player->pos[0]-1;
+                print_player(player->pos, player_tile);
             }
-            //Return new position
-            return (player->pos) + width;
+            if((Tiles+((tile_ids[(player->pos[1])][(player->pos[0])-1])))->flags[2] == 'n')
+            {
+                jump_to(height*tile_height, 0);
+                printf("\x1b[0J");
+                display_message((Tiles+((tile_ids[(player->pos[1])][(player->pos[0])-1])))->msg_id, Messages, mode);
+                *had_message = 1;
+            }
+            else if(*had_message == 1)
+            {
+                jump_to(height*tile_height, 0);
+                printf("\x1b[0J");
+                display_message(0, Messages, mode);
+                *had_message = 0;
+            }
+
         }
     }
-    //Same deal, but now we want to check to the left, which is -1 instead of adding or subtracting width.
-    if (input == 2)
+    if(input == 2)
     {
-        if((player->pos) - 1 >= 0 && (Tiles + linear_ids[(player->pos) - 1])->flags[1] == 'd')
+        if(player->pos[1]-1 >= 0 && (Tiles+((tile_ids[(player->pos[1]-1)][(player->pos[0])])))->flags[0] != 'c')
         {
-            //If we hit a door
-            prewarppos = player->pos;
-            player->pos = (Tiles + linear_ids[(player->pos) - 1])->warp[1];
-            load_scene((scenes+(Tiles + linear_ids[prewarppos - 1])->warp[0]), tile_ids, tile_frequency);
-            get_frequency(tile_ids, tile_frequency);
-            screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, (Tiles + linear_ids[prewarppos - 1])->warp[1], player_tile, screen_size, mode);
-            return player->pos;
-        }
-        if ((player->pos) - 1 >= 0 && (player->pos)%width != 0 && (Tiles + linear_ids[(player->pos) - 1])->flags[0]!= 'c')
-        {
-            //Draw the player if we aren't colliding
-            for(int i = 0; i < (tile_width*tile_height); i++)
+            if((Tiles+((tile_ids[(player->pos[1]-1)][(player->pos[0])])))->flags[1] == 'd')
             {
-                scrstr[tile_map[(player->pos)][i]] = bgmap[tile_map[(player->pos)][i]];
-                if(player_tile[i] == trans_symbol)
-                {
-                    scrstr[tile_map[(player->pos) - 1][i]] = bgmap[tile_map[(player->pos) - 1][i]];
-                }
-                else if (player_tile[i] == blank_symbol)
-                {
-                    scrstr[tile_map[(player->pos) - 1][i]] = 32;
-                }
-                else
-                {
-                    scrstr[tile_map[(player->pos) -1][i]] = (int) player_tile[i];
-                }
-            }
-            //Check NPC message
-            if((Tiles + linear_ids[((player->pos) - 1)-width])->flags[2] == 'n')
-            {
-                *msg = (Tiles + linear_ids[((player->pos) - 1)-width])->msg_id;
+                prewarppos[0] = player->pos[0];
+                prewarppos[1] = player->pos[1];
+                player->pos[0] = (Tiles+((tile_ids[(player->pos[1]-1)][(player->pos[0])])))->warp[1];
+                player->pos[1] = (Tiles+((tile_ids[(prewarppos[1]-1)][(prewarppos[0])])))->warp[2];
+                load_scene((scenes+(Tiles+((tile_ids[(prewarppos[1]-1)][(prewarppos[0])])))->warp[0]), tile_ids, tile_frequency);
+                get_frequency(tile_ids, tile_frequency);
+                screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, screen_size, mode);
+                system("cls");
+                print_screen(scrstr, screen_size, mode);
+                display_message(0, Messages, mode);
+                print_player(player->pos, player_tile);
             }
             else
             {
-                *msg = 0;
+                restore_to_pos(player->pos, scrstr, tile_map, position_map);
+                player->pos[1] = player->pos[1]-1;
+                print_player(player->pos, player_tile);
             }
-            //Return new position
-            return (player->pos) - 1;
+            if((Tiles+((tile_ids[(player->pos[1])][(player->pos[0])-1])))->flags[2] == 'n')
+            {
+                jump_to(height*tile_height, 0);
+                printf("\x1b[0J");
+                display_message((Tiles+((tile_ids[(player->pos[1])][(player->pos[0])-1])))->msg_id, Messages, mode);
+                *had_message = 1;
+            }
+            else if(*had_message == 1)
+            {
+                jump_to(height*tile_height, 0);
+                printf("\x1b[0J");
+                display_message(0, Messages, mode);
+                *had_message = 0;
+            }
         }
     }
-    //And finally, now we add one to position instead of subtract to move to the right.
-    if (input == 4)
+    if(input == 3)
     {
-        if((player->pos)%width != (width-1)  && (Tiles + linear_ids[(player->pos) + 1])->flags[1] == 'd')
+        if (player->pos[0]+1 < height && (Tiles+((tile_ids[(player->pos[1])][(player->pos[0])+1])))->flags[0] != 'c')
         {
-            //If we hit a door
-            prewarppos = player->pos;
-            player->pos = (Tiles + linear_ids[(player->pos) + 1])->warp[1];
-            load_scene((scenes+(Tiles + linear_ids[prewarppos + 1])->warp[0]), tile_ids, tile_frequency);
-            get_frequency(tile_ids, tile_frequency);
-            screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, (Tiles + linear_ids[prewarppos + 1])->warp[1], player_tile, screen_size, mode);
-            return player->pos;
-        }
-        if ((player->pos) + 1 >= 0 && (player->pos)%width != (width-1)  && (Tiles + linear_ids[(player->pos) + 1])->flags[0]!= 'c')
-        {
-            //Draw the player
-            for(int i = 0; i < (tile_width*tile_height); i++)
+            if((Tiles+((tile_ids[(player->pos[1])][(player->pos[0])+1])))->flags[1] == 'd')
             {
-                scrstr[tile_map[(player->pos)][i]] = bgmap[tile_map[(player->pos)][i]];
-                if(player_tile[i] == trans_symbol)
-                {
-                    scrstr[tile_map[(player->pos) + 1][i]] = bgmap[tile_map[(player->pos) + 1][i]];
-                }
-                else if (player_tile[i] == blank_symbol)
-                {
-                    scrstr[tile_map[(player->pos) + 1][i]] = 32;
-                }
-                else
-                {
-                    scrstr[tile_map[(player->pos) + 1][i]] = (int) player_tile[i];
-                }
-            }
-            //Check NPC message
-            if((Tiles + linear_ids[((player->pos) + 1)-width])->flags[2] == 'n')
-            {
-                *msg = (Tiles + linear_ids[((player->pos) +1)-width])->msg_id;
+                prewarppos[0] = player->pos[0];
+                prewarppos[1] = player->pos[1];
+                player->pos[0] = (Tiles+((tile_ids[(player->pos[1])][(player->pos[0])+1])))->warp[1];
+                player->pos[1] = (Tiles+((tile_ids[(prewarppos[1])][(prewarppos[0])+1])))->warp[2];
+                load_scene((scenes+(Tiles+((tile_ids[(prewarppos[1])][(prewarppos[0])+1])))->warp[0]), tile_ids, tile_frequency);
+                get_frequency(tile_ids, tile_frequency);
+                screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, screen_size, mode);
+                system("cls");
+                print_screen(scrstr, screen_size, mode);
+                display_message(0, Messages, mode);
+                print_player(player->pos, player_tile);
             }
             else
             {
-                *msg = 0;
+                restore_to_pos(player->pos, scrstr,tile_map, position_map);
+                player->pos[0] = player->pos[0]+1;
+                print_player(player->pos, player_tile);
             }
-            //Return new position
-            return (player->pos) + 1;
+            if((Tiles+((tile_ids[(player->pos[1])][(player->pos[0])-1])))->flags[2] == 'n')
+            {
+                jump_to(height*tile_height, 0);
+                printf("\x1b[0J");
+                display_message((Tiles+((tile_ids[(player->pos[1])][(player->pos[0])-1])))->msg_id, Messages, mode);
+                *had_message = 1;
+            }
+            else if(*had_message == 1)
+            {
+                jump_to(height*tile_height, 0);
+                printf("\x1b[0J");
+                display_message(0, Messages, mode);
+                *had_message = 0;
+            }
         }
     }
-
-    //Safety return.
-    return (player->pos);
-
+    if(input == 4)
+    {
+        if(player->pos[1]+1<width && (Tiles+((tile_ids[(player->pos[1])+1][(player->pos[0])])))->flags[0] != 'c')
+        {
+            if((Tiles+((tile_ids[(player->pos[1])+1][(player->pos[0])])))->flags[1] == 'd')
+            {
+                prewarppos[0] = player->pos[0];
+                prewarppos[1] = player->pos[1];
+                player->pos[0] = (Tiles+((tile_ids[(player->pos[1])+1][(player->pos[0])])))->warp[1];
+                player->pos[1] = (Tiles+((tile_ids[(prewarppos[1])+1][(prewarppos[0])])))->warp[2];
+                load_scene((scenes+(Tiles+((tile_ids[(prewarppos[1])+1][(prewarppos[0])])))->warp[0]), tile_ids, tile_frequency);
+                get_frequency(tile_ids, tile_frequency);
+                screen_manager(scrstr, bgmap, tile_map, Tiles, tile_ids, tile_frequency, linear_ids, screen_size, mode);
+                system("cls");
+                print_screen(scrstr, screen_size, mode);
+                display_message(0, Messages, mode);
+                print_player(player->pos, player_tile);
+            }
+            else
+            {
+                restore_to_pos(player->pos, scrstr, tile_map, position_map);
+                player->pos[1] = player->pos[1]+1;
+                print_player(player->pos, player_tile);
+            }
+            if((Tiles+((tile_ids[(player->pos[1])][(player->pos[0])-1])))->flags[2] == 'n')
+            {
+                jump_to(height*tile_height, 0);
+                printf("\x1b[0J");
+                display_message((Tiles+((tile_ids[(player->pos[1])][(player->pos[0])-1])))->msg_id, Messages, mode);
+                *had_message = 1;
+            }
+            else if(*had_message == 1)
+            {
+                jump_to(height*tile_height, 0);
+                printf("\x1b[0J");
+                display_message(0, Messages, mode);
+                *had_message = 0;
+            }
+        }
+    }
 }
 //Prints the text box and message inside at the bottom of the screen
 void print_menu(char text[], char mode)
@@ -623,7 +546,7 @@ void print_menu(char text[], char mode)
     printf("\n");
 
     //prints the left border, the line of text, then the right border
-    for (int l = 0; l < (height * tile_height) / 3; l++)
+    for (int l = 0; l < (height * tile_height) / MENU_HEIGHT; l++)
     {
         printf(" ");
         for (int j = 0; j <= (width * tile_width) - 1; j++)
@@ -736,13 +659,14 @@ void read_tiles(int amount, struct tile* Tiles)
         char flag3 = '\0';
         int warp1 = 0;
         int warp2 = 0;
+        int warp3 = 0;
         int id = 0;
         int msg = 0;
         int ui_id = 0;
         char ui_dir = '\0';
 
         //Read into variable
-        fscanf(index, "%d\n%s\n%s\n%c\n%c\n%c\n%d\n%d\n%d\n%d\n%c\n", &id, &name, &file, &flag1, &flag2, &flag3, &warp1, &warp2, &msg, &ui_id, &ui_dir);
+        fscanf(index, "%d\n%s\n%s\n%c\n%c\n%c\n%d\n%d\n%d\n%d\n%d\n%c\n", &id, &name, &file, &flag1, &flag2, &flag3, &warp1, &warp2, &warp3, &msg, &ui_id, &ui_dir);
 
         //Set id
         (Tiles+i)->id = id;
@@ -761,6 +685,7 @@ void read_tiles(int amount, struct tile* Tiles)
         (Tiles+i)->flags[2] = flag3;
         (Tiles+i)->warp[0] = warp1;
         (Tiles+i)->warp[1] = warp2;
+        (Tiles+i)->warp[2] = warp3;
         (Tiles+i)->msg_id = msg;
         (Tiles+i)->ui_id = ui_id;
         (Tiles+i)->ui_dir = ui_dir;
@@ -896,4 +821,171 @@ void clear_screen()
 {
     printf("\x1b[%d;%df", 0, 0);
     printf("\x1b[0J");
+}
+void print_player(int pos[2], char player_tile[(tile_width*tile_height)])
+{
+    int tick = 0;
+    for(int i = 0; i<tile_height;i++)
+    {
+        for(int j = 0; j<tile_width;j++)
+        {
+            jump_to(((pos[0]*tile_height)+i), ((pos[1]*tile_width+j)));
+            switch(player_tile[tick])
+            {
+                case 'H': printf(BLACK);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'R': printf(DARK_RED);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'G': printf(DARK_GREEN);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'Y': printf(DARK_YELLOW);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'B': printf(DARK_BLUE);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'M': printf(DARK_MAGENTA);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'C': printf(DARK_CYAN);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'W': printf(DARK_WHITE);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'h': printf(BRIGHT_BLACK);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'r': printf(BRIGHT_RED);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'g': printf(BRIGHT_GREEN);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'y': printf(BRIGHT_YELLOW);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'b': printf(BRIGHT_BLUE);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'm': printf(BRIGHT_MAGENTA);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'c': printf(BRIGHT_CYAN);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'w': printf(WHITE);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+            }
+            tick = tick+1;
+            jump_to((height*tile_height)+(MENU_HEIGHT*tile_height)+3, 0);
+            printf("\x1b[0J");
+        }
+    }
+}
+void restore_to_pos(int pos[2], int *scrstr, int tile_map[(height*width)][(tile_height*tile_width)], int position_map[height][width])
+{
+    int tick = 0;
+    for(int i = 0; i<tile_height;i++)
+    {
+        for(int j = 0; j<tile_width;j++)
+        {
+            jump_to(((pos[0]*tile_height)+i), ((pos[1]*tile_width+j)));
+
+            switch((char)scrstr[tile_map[position_map[pos[0]][pos[1]]][tick]])
+            {
+                case 'H': printf(BLACK);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'R': printf(DARK_RED);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'G': printf(DARK_GREEN);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'Y': printf(DARK_YELLOW);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'B': printf(DARK_BLUE);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'M': printf(DARK_MAGENTA);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'C': printf(DARK_CYAN);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'W': printf(DARK_WHITE);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'h': printf(BRIGHT_BLACK);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'r': printf(BRIGHT_RED);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'g': printf(BRIGHT_GREEN);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'y': printf(BRIGHT_YELLOW);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'b': printf(BRIGHT_BLUE);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'm': printf(BRIGHT_MAGENTA);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'c': printf(BRIGHT_CYAN);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+                case 'w': printf(WHITE);
+                    putchar(' ');
+                    printf(RESET);
+                    break;
+            }
+            tick = tick+1;
+            jump_to((height*tile_height)+(MENU_HEIGHT*tile_height)+3, 0);
+            printf("\x1b[0J");
+        }
+    }
+}
+void jump_to(int row, int col)
+{
+    printf("\x1b[%d;%df", row+1, col+1);
 }
