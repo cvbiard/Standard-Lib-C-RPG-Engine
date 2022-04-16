@@ -13,6 +13,8 @@
 int main(void)
 {
 
+ 
+
     //Initializing the game
     char mode = 'p';
 
@@ -27,6 +29,7 @@ int main(void)
     int scene_amount = 0;
     int msg_amount = 0;
     FILE *ta = fopen("TileAmount.txt", "r");
+    
     fscanf(ta, "%d", &tile_amount);
     fclose(ta);
     printf("%d\n", tile_amount);
@@ -110,6 +113,8 @@ int main(void)
 
     //Now, we give scenes the same treatment as tiles. Create an array of the correct size, and read in the information (specifically only the id and file name) from SceneIndex.txt.
     struct asset* scenes = (struct asset*) malloc(scene_amount*sizeof(struct asset));
+
+    
 
     //Again reading from a file is nice because it allows for scene creation without having to rebuild.
     read_scenes(scene_amount, scenes);
