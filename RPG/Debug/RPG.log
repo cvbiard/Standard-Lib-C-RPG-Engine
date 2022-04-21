@@ -1,30 +1,30 @@
 ﻿  main.c
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(150,26): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(150,20): warning C4024: 'screen_manager': different types for formal and actual parameter 1
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(150,33): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(150,28): warning C4024: 'screen_manager': different types for formal and actual parameter 2
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(150,88): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(150,78): warning C4024: 'screen_manager': different types for formal and actual parameter 7
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(156,24): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(156,18): warning C4024: 'print_screen': different types for formal and actual parameter 1
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(171,18): warning C4022: 'free': pointer mismatch for actual parameter 1
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(172,18): warning C4022: 'free': pointer mismatch for actual parameter 1
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(181,37): warning C4047: 'function': 'void (__cdecl *)(void)' differs in levels of indirection from 'int'
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(181,26): warning C4024: 'atexit': different types for formal and actual parameter 1
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(190,34): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(190,28): warning C4024: 'screen_manager': different types for formal and actual parameter 1
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(190,41): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(190,36): warning C4024: 'screen_manager': different types for formal and actual parameter 2
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(190,96): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(190,86): warning C4024: 'screen_manager': different types for formal and actual parameter 7
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(202,20): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(202,14): warning C4024: 'move': different types for formal and actual parameter 1
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(202,27): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(202,22): warning C4024: 'move': different types for formal and actual parameter 2
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(202,69): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(202,59): warning C4024: 'move': different types for formal and actual parameter 6
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(222,7): warning C4022: 'free': pointer mismatch for actual parameter 1
-C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\main.c(223,7): warning C4022: 'free': pointer mismatch for actual parameter 1
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(150,26): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(150,20): warning C4024: 'screen_manager': different types for formal and actual parameter 1
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(150,33): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(150,28): warning C4024: 'screen_manager': different types for formal and actual parameter 2
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(150,88): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(150,78): warning C4024: 'screen_manager': different types for formal and actual parameter 7
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(156,24): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(156,18): warning C4024: 'print_screen': different types for formal and actual parameter 1
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(171,18): warning C4022: 'free': pointer mismatch for actual parameter 1
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(172,18): warning C4022: 'free': pointer mismatch for actual parameter 1
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(181,37): warning C4047: 'function': 'void (__cdecl *)(void)' differs in levels of indirection from 'int'
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(181,26): warning C4024: 'atexit': different types for formal and actual parameter 1
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(190,34): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(190,28): warning C4024: 'screen_manager': different types for formal and actual parameter 1
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(190,41): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(190,36): warning C4024: 'screen_manager': different types for formal and actual parameter 2
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(190,96): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(190,86): warning C4024: 'screen_manager': different types for formal and actual parameter 7
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(202,20): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(202,14): warning C4024: 'move': different types for formal and actual parameter 1
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(202,27): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(202,22): warning C4024: 'move': different types for formal and actual parameter 2
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(202,69): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(202,59): warning C4024: 'move': different types for formal and actual parameter 6
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(222,7): warning C4022: 'free': pointer mismatch for actual parameter 1
+D:\Standard-Lib-C-RPG-Engine\RPG\main.c(223,7): warning C4022: 'free': pointer mismatch for actual parameter 1
   protos.c
   Generating Code...
-  RPG.vcxproj -> C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\Debug\RPG.exe
+  RPG.vcxproj -> D:\Standard-Lib-C-RPG-Engine\RPG\Debug\RPG.exe

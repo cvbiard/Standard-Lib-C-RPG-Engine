@@ -3,3 +3,4 @@ C:\Users\Clark\Desktop\CS121\Clark Biard\RPG\Debug\RPG.pdb
 C:\Users\Clark\Desktop\RPG\Debug\RPG.exe
 C:\Users\Clark\Desktop\RPG\Debug\RPG.pdb
 C:\Users\Clark\Desktop\Standard-Lib-C-RPG-Engine\RPG\Debug\RPG.exe
+D:\Standard-Lib-C-RPG-Engine\RPG\Debug\RPG.exe
